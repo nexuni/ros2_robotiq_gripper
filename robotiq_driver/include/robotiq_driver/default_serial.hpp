@@ -70,6 +70,10 @@ public:
   void set_baudrate(uint32_t baudrate) override;
   [[nodiscard]] uint32_t get_baudrate() const override;
 
+  void flush(){serial_->flush();}
+  void flushInput(){serial_->flushInput();}
+  void flushOutput(){serial_->flushOutput();}
+
 private:
   std::unique_ptr<serial::Serial> serial_ = nullptr;
 };

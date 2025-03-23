@@ -82,7 +82,10 @@ hardware_interface::CallbackReturn RobotiqGripperHardwareInterface::on_init(cons
   }
 
   // Read parameters.
-  gripper_closed_pos_ = stod(info_.hardware_parameters["gripper_closed_position"]);
+  // gripper_closed_pos_ = stod(info_.hardware_parameters["gripper_closed_position"]);
+  gripper_position_min_ = std::stod(info_.hardware_parameters["grip_pos_min"]);
+  gripper_position_max_ = std::stod(info_.hardware_parameters["grip_pos_max"]);
+  gripper_postion_step_ = (gripper_position_max_ - gripper_position_min_) / 255.0;
 
   gripper_position_ = std::numeric_limits<double>::quiet_NaN();
   gripper_velocity_ = std::numeric_limits<double>::quiet_NaN();
@@ -218,7 +221,7 @@ RobotiqGripperHardwareInterface::on_activate(const rclcpp_lifecycle::State& /*pr
   // set some default values for joints
   if (std::isnan(gripper_position_))
   {
-    gripper_position_ = 0;
+    gripper_position_ = gripper_position_max_;
     gripper_velocity_ = 0;
     gripper_position_command_ = 0;
   }
@@ -270,7 +273,8 @@ RobotiqGripperHardwareInterface::on_deactivate(const rclcpp_lifecycle::State& /*
 hardware_interface::return_type RobotiqGripperHardwareInterface::read(const rclcpp::Time& /*time*/,
                                                                       const rclcpp::Duration& /*period*/)
 {
-  gripper_position_ = gripper_closed_pos_ * (gripper_current_state_.load() - kGripperMinPos) / kGripperRange;
+  // gripper_position_ = gripper_closed_pos_ * (gripper_current_state_.load() - kGripperMinPos) / kGripperRange;
+  gripper_position_ = gripper_position_max_ - (gripper_current_state_.load() * gripper_postion_step_);
 
   if (!std::isnan(reactivate_gripper_cmd_))
   {
@@ -291,12 +295,18 @@ hardware_interface::return_type RobotiqGripperHardwareInterface::read(const rclc
 hardware_interface::return_type RobotiqGripperHardwareInterface::write(const rclcpp::Time& /*time*/,
                                                                        const rclcpp::Duration& /*period*/)
 {
-  double gripper_pos = (gripper_position_command_ / gripper_closed_pos_) * kGripperRange + kGripperMinPos;
+  // double gripper_pos = (gripper_position_command_ / gripper_closed_pos_) * kGripperRange + kGripperMinPos;
+  // gripper_pos = std::max(std::min(gripper_pos, 255.0), 0.0);
+  // write_command_.store(uint8_t(gripper_pos));
+
+  double gripper_pos = (gripper_position_max_ - gripper_position_command_) / gripper_postion_step_;
   gripper_pos = std::max(std::min(gripper_pos, 255.0), 0.0);
   write_command_.store(uint8_t(gripper_pos));
-  gripper_speed_ = kGripperMaxSpeed * std::clamp(fabs(gripper_speed_) / kGripperMaxSpeed, 0.0, 1.0);
+  // gripper_speed_ = kGripperMaxSpeed * std::clamp(fabs(gripper_speed_) / kGripperMaxSpeed, 0.0, 1.0);
+  gripper_speed_ = std::clamp(fabs(gripper_speed_), 0.0, 1.0);
   write_speed_.store(uint8_t(gripper_speed_ * 0xFF));
-  gripper_force_ = kGripperMaxforce * std::clamp(fabs(gripper_force_) / kGripperMaxforce, 0.0, 1.0);
+  // gripper_force_ = kGripperMaxforce * std::clamp(fabs(gripper_force_) / kGripperMaxforce, 0.0, 1.0);
+  gripper_force_ = std::clamp(fabs(gripper_force_), 0.0, 1.0);
   write_force_.store(uint8_t(gripper_force_ * 0xFF));
 
   return hardware_interface::return_type::OK;

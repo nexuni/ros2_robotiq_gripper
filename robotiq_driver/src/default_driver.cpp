@@ -32,6 +32,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <thread>
+#include <iomanip>
 
 #include "robotiq_driver/data_utils.hpp"
 #include "robotiq_driver/default_driver.hpp"
@@ -81,6 +82,16 @@ DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial)
 
 std::vector<uint8_t> DefaultDriver::send(const std::vector<uint8_t>& request, size_t response_size) const
 {
+  // std::cout << "1. Request contents in hex: ";
+  // for (uint8_t byte : request) {
+  //   std::cout << "0x" 
+  //             << std::hex << std::uppercase 
+  //             << std::setw(2) << std::setfill('0')
+  //             << static_cast<int>(byte) << " ";
+  // }
+  // std::cout << std::dec << std::endl;
+  // std::cout << "response_size: " << response_size << std::endl;
+
   std::vector<uint8_t> response;
   response.reserve(response_size);
 
@@ -90,6 +101,7 @@ std::vector<uint8_t> DefaultDriver::send(const std::vector<uint8_t>& request, si
     try
     {
       serial_->write(request);
+      serial_->flushInput();
       response = serial_->read(response_size);
       break;
     }
@@ -106,6 +118,15 @@ std::vector<uint8_t> DefaultDriver::send(const std::vector<uint8_t>& request, si
     RCLCPP_ERROR(kLogger, "Reached maximum retries. Operation failed.");
     return {};
   }
+
+  // std::cout << "2. Response contents in hex: ";
+  //   for (uint8_t byte : response) {
+  //     std::cout << "0x" 
+  //               << std::hex << std::uppercase  
+  //               << std::setw(2) << std::setfill('0') 
+  //               << static_cast<int>(byte) << " ";
+  //   }
+  //   std::cout << std::dec << std::endl;
 
   return response;
 }

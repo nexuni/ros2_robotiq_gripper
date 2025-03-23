@@ -140,7 +140,11 @@ protected:
   std::atomic<bool> communication_thread_is_running_;
   void background_task();
 
-  double gripper_closed_pos_ = 0.0;
+  // double gripper_closed_pos_ = 0.0;
+  double gripper_position_min_;
+  double gripper_position_max_;
+  double gripper_postion_step_;
+
 
   static constexpr double NO_NEW_CMD_ = std::numeric_limits<double>::quiet_NaN();
 

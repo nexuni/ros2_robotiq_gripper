@@ -119,5 +119,9 @@ public:
    * @return An integer that sets the baud rate for the serial port.
    */
   [[nodiscard]] virtual uint32_t get_baudrate() const = 0;
+
+  virtual void flush() = 0;
+  virtual void flushInput() = 0;
+  virtual void flushOutput() = 0;
 };
 }  // namespace robotiq_driver
