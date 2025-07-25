@@ -3,6 +3,9 @@
 cmake_minimum_required(VERSION 3.8)
 project(robotiq_driver LANGUAGES CXX)
 
+# Disable testing by default
+option(BUILD_TESTING "Build the testing tree." OFF)
+
 # This module provides installation directories as per the GNU coding standards.
 include(GNUInstallDirs)
 
