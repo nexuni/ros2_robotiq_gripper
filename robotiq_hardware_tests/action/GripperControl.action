@@ -1,0 +1,11 @@
+# Goal
+float64 position  # Commanded gripper position in meters (0.0 to 0.025)
+---
+# Result  
+bool success      # True if gripper reached the target or detected an object
+string message    # Status message
+float64 final_position  # Final gripper position achieved
+---
+# Feedback
+float64 current_position  # Current gripper position during movement
+string status            # Current status (moving, detecting, etc.) 

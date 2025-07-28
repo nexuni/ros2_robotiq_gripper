@@ -78,6 +78,12 @@ public:
   bool gripper_is_moving() override;
 
   /**
+   * @brief Returns true if the gripper is detected while closing, false otherwise.
+   *
+   */
+  bool gripper_detected_while_closing();
+
+  /**
    * @brief Set the speed of the gripper.
    * @param speed A value between 0x00 (stopped) and 0xFF (full speed).
    */

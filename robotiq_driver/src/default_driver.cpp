@@ -213,6 +213,12 @@ bool DefaultDriver::gripper_is_moving()
   return object_detection_status_ == ObjectDetectionStatus::MOVING;
 }
 
+bool DefaultDriver::gripper_detected_while_closing()
+{
+  update_status();
+  return object_detection_status_ == ObjectDetectionStatus::OBJECT_DETECTED_CLOSING;
+}
+
 void DefaultDriver::set_speed(uint8_t speed)
 {
   commanded_gripper_speed_ = speed;

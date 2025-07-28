@@ -116,13 +116,13 @@ int main(int argc, char* argv[])
     driver->activate();
 
     std::cout << "The gripper is activated." << std::endl;
-    std::cout << "Closing the gripper..." << std::endl;
+    // std::cout << "Closing the gripper..." << std::endl;
 
-    driver->set_gripper_position(0xFF);
-    while (driver->gripper_is_moving())
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
+    // driver->set_gripper_position(0xFF);
+    // while (driver->gripper_is_moving())
+    // {
+    //   std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    // }
 
     std::cout << "Opening the gripper..." << std::endl;
     driver->set_gripper_position(0x00);
@@ -131,39 +131,24 @@ int main(int argc, char* argv[])
       std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
-    std::cout << "Half closing the gripper..." << std::endl;
-    driver->set_gripper_position(0x80);
-    while (driver->gripper_is_moving())
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
-    std::cout << "Opening gripper..." << std::endl;
-    driver->set_gripper_position(0x00);
-    while (driver->gripper_is_moving())
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
-
-    std::cout << "Decreasing gripper speed..." << std::endl;
+    std::cout << "Grabbing..." << std::endl;
     driver->set_speed(0x0F);
-
-    std::cout << "Closing gripper...\n";
+    driver->set_force(0x0A);
     driver->set_gripper_position(0xFF);
-    while (driver->gripper_is_moving())
+    uint8_t gripper_pos = driver->get_gripper_position();
+    while (!driver->gripper_detected_while_closing() && gripper_pos != 0xFF)
     {
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      gripper_pos = driver->get_gripper_position();
+      std::cout << "Grabbing... @" << int(gripper_pos) << std::endl;
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 
-    std::cout << "Increasing gripper speed..." << std::endl;
-    driver->set_speed(0xFF);
-
-    std::cout << "Opening gripper..." << std::endl;
-    driver->set_gripper_position(0x00);
-    while (driver->gripper_is_moving())
-    {
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
+    driver->set_gripper_position(gripper_pos);
+    gripper_pos = driver->get_gripper_position();
+    std::cout << "Grabbed!! @" << int(gripper_pos) << std::endl;
+    
   }
   catch (const std::exception& e)
   {

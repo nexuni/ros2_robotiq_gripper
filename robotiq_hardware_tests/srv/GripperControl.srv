@@ -1,0 +1,6 @@
+# Request
+float64 position  # Commanded gripper position in meters (0.0 to 0.025)
+---
+# Response
+bool success      # True if command was successfully sent to gripper
+string message    # Status message 
