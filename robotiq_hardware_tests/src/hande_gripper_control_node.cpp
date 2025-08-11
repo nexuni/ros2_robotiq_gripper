@@ -59,6 +59,9 @@ class HandeGripperControlNode : public rclcpp::Node
 public:
   HandeGripperControlNode() : Node("hande_gripper_control_node")
   {
+    // delay 2 seconds
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    
     // Initialize gripper driver
     if (!initialize_gripper())
     {
